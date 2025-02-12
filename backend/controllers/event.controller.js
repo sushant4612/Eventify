@@ -12,6 +12,7 @@ const eventSchema = z.object({
     date: z.preprocess((val) => new Date(val), z.date()),
     location: z.string().min(3).max(20),
     imageUrl: z.string().min(3).max(100),
+    totalSeats: z.number().min(1),
 })
 
 const createEvent = asyncHandler(async (req, res) => {
@@ -32,16 +33,19 @@ const createEvent = asyncHandler(async (req, res) => {
     req.body.date = new Date(req.body.date)    
 
     const {title, description, date, location} = req.body
+    let totalSeats = req.body.totalSeats
 
-    if(!title || !description || !date || !location) {
+    if(!title || !description || !date || !location || !totalSeats) {
         throw new ApiError(400, "All fields are required")
     }
 
-    if(!eventSchema.parse({title, description, date, location, imageUrl})) {
+    totalSeats = parseInt(totalSeats)
+
+    if(!eventSchema.parse({title, description, date, location, imageUrl, totalSeats})) {
         throw new ApiError(400, "Invalid request body")
     }
 
-    await Event.create({title, description, date, location, imageUrl, createdBy: req._id})
+    await Event.create({title, description, date, location, imageUrl, createdBy: req._id, totalSeats, bookedSeats: 0})
 
     return res.status(201).json(new ApiResponse(201, "Event created successfully"))
 })
@@ -70,6 +74,10 @@ const updateEvent = asyncHandler(async (req, res) => {
         }
     });
 
+    if(updateData.totalSeats) {
+        updateData.bookedSeats = 0
+    }
+
     if (req.file) {
         try {
             const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
@@ -94,23 +102,23 @@ const deleteEvent = asyncHandler(async (req, res) => {
 
 const bookTicket = asyncHandler(async (req, res) => {
     const {id} = req.params
-    const userId = req._id
     
     const event = await Event.findById(id)
 
     if(!event) {
         throw new ApiError(404, "Event not found")
     }
-    if(event.attendees.includes(userId)) {
-        throw new ApiError(400, "You have already booked a ticket for this event")
+
+    if(event.bookedSeats >= event.totalSeats) {
+        throw new ApiError(400, "Event is fully booked")
     }
-    
-    event.attendees.push(userId)
+
+    event.bookedSeats++
     await event.save()
 
     // Emit real-time update
     io.emit(`event-${id}-attendees`, {
-        attendeeCount: event.attendees.length,
+        attendeeCount: event.bookedSeats,
         eventId: id
     });
 
@@ -119,21 +127,19 @@ const bookTicket = asyncHandler(async (req, res) => {
 
 const cancelTicket = asyncHandler(async (req, res) => {
     const {id} = req.params
-    const userId = req._id
     const event = await Event.findById(id) 
     if(!event) {
         throw new ApiError(404, "Event not found")
     }
-    if(!event.attendees.includes(userId)) {
-        throw new ApiError(400, "You have not booked a ticket for this event")
+    if(event.bookedSeats <= 0) {
+        throw new ApiError(400, "Event is not booked")
     }
-    
-    event.attendees = event.attendees.filter((user) => user.toString() !== userId)
+    event.bookedSeats--
     await event.save()
 
     // Emit real-time update
     io.emit(`event-${id}-attendees`, {
-        attendeeCount: event.attendees.length,
+        attendeeCount: event.bookedSeats,
         eventId: id
     });
 

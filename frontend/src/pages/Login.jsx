@@ -1,16 +1,60 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import { EventContext } from '../context/EventContext';
 
 const Login = () => {
   const [currentState, setCurrentState] = useState('Login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const {navigate, setToken} = useContext(EventContext);
+  const login = async (formData) => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, formData);
+      console.log(response.data.data);
+      
+      const token = response.data.data;
+      localStorage.setItem('token', token);
+      setToken(token);
+      navigate('/');
+      toast.success('Login successful');
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const signup = async (formData) => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, formData);
+      const token = response.data.data;
+      localStorage.setItem('token', token);
+      setToken(token);
+      navigate('/');
+      toast.success('Signup successful');
+    } catch (error) {
+        console.log(error);
+        toast.error(error.response.data.message);
+    }
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log('Form submitted:', { username, password, email });
+    const formData = { username, password, email };
+    if(currentState === 'Login'){
+      login(formData);
+    }else{
+      signup(formData);
+    }
+    console.log('Form submitted:', formData);
   };
+
+  useEffect(() => {
+    if(localStorage.getItem('token')){
+      navigate('/');
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
@@ -44,33 +88,33 @@ const Login = () => {
 
           {currentState === 'Sign Up' && (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">
+                <label className="block text-sm font-medium text-gray-300">
                 Email
-              </label>
-              <input
+                </label>
+                <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 rounded-md bg-gray-800 border border-gray-700 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition"
                 placeholder="Enter your email"
                 required
-              />
+                />
             </div>
           )}
 
           {currentState === 'Login' && (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                <label className="block text-sm font-medium text-gray-300">
+                Email
+                </label>
+                <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 rounded-md bg-gray-800 border border-gray-700 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition"
-                placeholder="Enter your username"
+                placeholder="Enter your email"
                 required
-              />
+                />
             </div>
           )}
 

@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import { urlencoded } from "express";
 import { createServer } from "http";
 import { initSocket } from "./socket.js";
+import cors from "cors";
 
 dotenv.config() 
 const app = express();
@@ -27,7 +28,7 @@ cloudinaryConfig()
 app.use(urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.json());
-
+app.use(cors())
 // import routes
 import authRoutes from "./routes/auth.route.js";
 import eventRoutes from "./routes/event.route.js";

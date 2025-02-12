@@ -1,7 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { EventContext } from '../context/EventContext';
+import EventCard from '../components/EventCard';
 
-const Event = () => {
+const EventDetails = () => {
   const { events, getAllEvents } = useContext(EventContext);
 
   useEffect(() => {
@@ -27,31 +28,6 @@ const Event = () => {
 
     setFilteredEvents(filtered);
   };
-
-  const EventCard = ({ event }) => (
-    <div className="bg-gray-900 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 ease-in-out relative group">
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-purple-600 rounded-lg blur opacity-0 group-hover:opacity-75 transition duration-300"></div>
-      <div className="relative bg-gray-900 rounded-lg overflow-hidden">
-        <img 
-          src={event.imageUrl} 
-          alt={event.title} 
-          className="w-full h-48 object-cover"
-        />
-        <div className="p-6">
-          <div className="text-sm text-red-500 mb-2">{event.category}</div>
-          <h3 className="text-xl font-bold text-white mb-2">{event.title}</h3>
-          <p className="text-gray-400 text-sm mb-4">{event.description}</p>
-          <div className="flex items-center text-gray-400 text-sm mb-4">
-            <span className="mr-4">📅 {event.date}</span>
-            <span>📍 {event.location}</span>
-          </div>
-          <button className="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition">
-            Book Now
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-black py-12">
@@ -91,7 +67,14 @@ const Event = () => {
         {filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredEvents.map(event => (
-              <EventCard key={event._id} event={event} />
+              <EventCard 
+                key={event._id} 
+                id={event._id} 
+                title={event.title} 
+                date={event.date} 
+                location={event.location} 
+                image={event.imageUrl} 
+              />
             ))}
           </div>
         ) : (
@@ -113,4 +96,4 @@ const Event = () => {
   );
 };
 
-export default Event;
+export default EventDetails;

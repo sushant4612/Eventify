@@ -26,10 +26,18 @@ const eventSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
-    attendees: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-    }]
+    totalSeats : {
+        type: Number,
+        required: true,
+    },
+    bookedSeats: {
+        type: Number,
+        default: 0,
+    },
+    category: {
+        type: String,
+        required: true,
+    },
 }, { timestamps: true })
 
 const Event = mongoose.models.Event || mongoose.model("Event", eventSchema)
