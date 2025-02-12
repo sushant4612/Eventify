@@ -2,24 +2,27 @@ import React, { useContext, useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import FeatureCard from '../components/FeatureCard';
 import EventCard from '../components/EventCard';
-import { cover } from '../assets';
+import { cover1 } from '../assets';
 import { EventContext } from '../context/EventContext';
 
 const Landing = () => {
-  const {events, getAllEvents} = useContext(EventContext)
-  const [loading, setLoading] = useState(true)
+  const { events, getAllEvents } = useContext(EventContext);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getAllEvents()
-    setLoading(false)
-  }, [])
+    getAllEvents();
+    setLoading(false);
+  }, [getAllEvents]);
+
+  // Limit the events to only 5
+  const limitedEvents = events.slice(0, 5);
 
   return (
     <div className="bg-black min-h-screen">
       {/* Hero Section */}
       <div className="relative h-[600px] overflow-hidden">
         <img 
-          src={cover}
+          src={cover1}
           alt="Hero" 
           className="w-full h-full object-cover"
         />
@@ -68,32 +71,31 @@ const Landing = () => {
       </div>
 
       {/* Upcoming Events Section */}
-      <div className="bg-slate-900 rounded-2xl py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-12">
-            <h2 className="text-3xl font-bold text-white">Upcoming Events</h2>
-            <NavLink to="/events" className="text-red-500 hover:text-red-400">
-              View All →
-            </NavLink>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {events.map((event) => (
-              <EventCard
-                key={event._id}
-                title={event.title}
-                date={event.date}
-                location={event.location}
-                image={event.imageUrl}
-              />
-            ))}
-            {loading && <div className="col-span-3">Loading...</div>}
-          </div>
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex justify-between items-center mb-12">
+          <h2 className="text-3xl font-bold text-white">Upcoming Events</h2>
+          <NavLink to="/events" className="text-red-500 hover:text-red-400">
+            View All →
+          </NavLink>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {limitedEvents.map((event) => (
+            <EventCard
+              key={event._id}
+              id={event._id} // Pass the event ID here
+              title={event.title}
+              date={event.date}
+              location={event.location}
+              image={event.imageUrl}
+            />
+          ))}
+          {loading && <div className="col-span-3">Loading...</div>}
         </div>
       </div>
 
       {/* Call to Action Section */}
       <div className="container mx-auto px-4 py-16">
-        <div className="bg-gradient-to-r bg-slate-900 rounded-2xl p-12 text-center">
+        <div className="bg-gradient-to-r border border-gray-800 rounded-2xl p-12 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Host Your Next Event?
           </h2>
@@ -107,7 +109,7 @@ const Landing = () => {
       </div>
 
       {/* Footer */}
-      <footer className=" py-12">
+      <footer className="py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>

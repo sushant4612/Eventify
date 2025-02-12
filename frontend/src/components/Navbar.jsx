@@ -23,6 +23,10 @@ const Navbar = () => {
                 Events
                 <div className='w-full h-[2px] bg-red-500 hidden group-hover:block'></div>
             </NavLink>
+            <NavLink to='/my-events' className='group'>
+                My Events
+                <div className='w-full h-[2px] bg-red-500 hidden group-hover:block'></div>
+            </NavLink>
             {token ? (<button onClick={handleLogout} className='bg-red-700 w-24 text-white px-4 hover:bg-red-500 py-2 rounded-md'>Logout</button>) : (<button onClick={() => navigate('/login')} className='bg-red-700 w-24 text-white px-4 hover:bg-red-500 py-2 rounded-md'>Login</button>)}
         </div>
     </div>

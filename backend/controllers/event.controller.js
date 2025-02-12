@@ -13,10 +13,11 @@ const eventSchema = z.object({
     location: z.string().min(3).max(20),
     imageUrl: z.string().min(3).max(100),
     totalSeats: z.number().min(1),
+    category: z.string().min(3).max(20),
 })
 
 const createEvent = asyncHandler(async (req, res) => {
-    console.log(req);
+    console.log(req.file);
     const image1 = req.file;
     
     if(!image1) {
@@ -32,20 +33,20 @@ const createEvent = asyncHandler(async (req, res) => {
 
     req.body.date = new Date(req.body.date)    
 
-    const {title, description, date, location} = req.body
+    const {title, description, date, location, category} = req.body
     let totalSeats = req.body.totalSeats
 
-    if(!title || !description || !date || !location || !totalSeats) {
+    if(!title || !description || !date || !location || !totalSeats || !category) {
         throw new ApiError(400, "All fields are required")
     }
 
     totalSeats = parseInt(totalSeats)
 
-    if(!eventSchema.parse({title, description, date, location, imageUrl, totalSeats})) {
+    if(!eventSchema.parse({title, description, date, location, imageUrl, totalSeats, category})) {
         throw new ApiError(400, "Invalid request body")
     }
 
-    await Event.create({title, description, date, location, imageUrl, createdBy: req._id, totalSeats, bookedSeats: 0})
+    await Event.create({title, description, date, location, imageUrl, createdBy: req._id, totalSeats, bookedSeats: 0, category})
 
     return res.status(201).json(new ApiResponse(201, "Event created successfully"))
 })
@@ -146,4 +147,9 @@ const cancelTicket = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, "Ticket cancelled successfully"))
 })
 
-export {createEvent, getAllEvents, getEventById, updateEvent, deleteEvent, bookTicket, cancelTicket}
+const getMyEvents = asyncHandler(async (req, res) => {
+    const events = await Event.find({createdBy: req._id})
+    return res.status(200).json(new ApiResponse(200, events, "My events fetched successfully"))
+})
+
+export {createEvent, getAllEvents, getEventById, updateEvent, deleteEvent, bookTicket, cancelTicket, getMyEvents}

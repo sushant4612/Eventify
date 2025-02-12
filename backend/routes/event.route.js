@@ -1,6 +1,6 @@
 import {Router} from "express"
 import authenticate from "../middlewares/auth.middleware.js"
-import {createEvent, deleteEvent, getAllEvents, getEventById, updateEvent, bookTicket, cancelTicket} from "../controllers/event.controller.js"
+import {createEvent, deleteEvent, getAllEvents, getEventById, updateEvent, bookTicket, cancelTicket, getMyEvents} from "../controllers/event.controller.js"
 import upload from "../middlewares/multer.js"
 
 const router = Router()
@@ -15,5 +15,6 @@ router.get("/:id", getEventById)
 router.post("/:id/book", authenticate, bookTicket)
 router.post("/:id/cancel", authenticate, cancelTicket)
 
+router.get("/my-events", authenticate, getMyEvents)
 
 export default router

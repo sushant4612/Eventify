@@ -8,7 +8,7 @@ import Login from './pages/Login'
 import Event from './pages/Event'
 import CreateEvent from './pages/CreateEvent'
 import EventDetails from './pages/EventDetails'
-
+import MyEvents from './pages/MyEvents'
 
 const App = () => {
   return (
@@ -19,6 +19,7 @@ const App = () => {
         <Route path='/' element={<Home />} />
         <Route path='/events' element={<Event />} />
         <Route path='/events/:id' element={<EventDetails />} />
+        <Route path='/my-events' element={<MyEvents />} />
         <Route path='/login' element={<Login />} />
         <Route path='/create' element={<CreateEvent />} />
       </Routes>

@@ -19,10 +19,7 @@ const EventCard = ({ id, title, date, location, image }) => {
         <p className="text-gray-400">{location}</p>
         <button 
           className="mt-4 w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevents navigation when clicking "Book Now"
-            console.log(`Booking event: ${id}`);
-          }}
+          onClick={() => console.log(`Booking event: ${id}`)}
         >
           Book Now
         </button>
